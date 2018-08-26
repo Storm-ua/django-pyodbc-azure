@@ -99,7 +99,10 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def convert_uuidfield_value(self, value, expression, connection):
         if value is not None:
-            value = uuid.UUID(value)
+            if type(value) == bytes:
+                value = uuid.UUID(bytes_le=value)
+            else:            
+                value = uuid.UUID(value)
         return value
 
     def date_extract_sql(self, lookup_type, field_name):
