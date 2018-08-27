@@ -99,7 +99,16 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def convert_uuidfield_value(self, value, expression, connection):
         if value is not None:
-            value = uuid.UUID(value)
+            if type(value) == bytes:
+                value = uuid.UUID(bytes=value)
+            else:
+                value = uuid.UUID(value)
+        return value
+    
+    def convert_booleanfield_value(self, value, expression, connection):
+        if value is not None:
+            if type(value) == bytes:
+                value = bool(value)
         return value
 
     def date_extract_sql(self, lookup_type, field_name):
@@ -195,6 +204,8 @@ class DatabaseOperations(BaseDatabaseOperations):
             converters.append(self.convert_floatfield_value)
         elif internal_type == 'UUIDField':
             converters.append(self.convert_uuidfield_value)
+        elif internal_type == 'BooleanField':
+            converters.append(self.convert_booleanfield_value)
         return converters
 
     def last_insert_id(self, cursor, table_name, pk_name):
